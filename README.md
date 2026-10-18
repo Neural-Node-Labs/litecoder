@@ -35,14 +35,14 @@ and `worker` (the lower-level worker engine, see [Worker CLI](#worker-cli)).
 1. Configure a provider once (stored in `~/.kooder/config.json`, mode `0600`):
 
    ```bash
-   litecoder --config "provider=deepseek,model=deepseek-chat"
+   kooder --config "provider=deepseek,model=deepseek-chat"
    echo 'key=sk-...' | litecoder --config -     # keeps the key out of shell history
    ```
 
    Local model via Ollama:
 
    ```bash
-   litecoder --config "mode=ollama,model=llama3"
+   kooder --config "mode=ollama,model=llama3"
    ```
 
 2. Run it in the project you want changed:

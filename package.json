@@ -1,6 +1,6 @@
 {
   "name": "litecoder",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "Plan one goal with a tool-less orchestrator, then delegate subtasks to concurrent ReAct worker agents (Kooder engine) from the command line.",
   "keywords": [
     "cli",
@@ -76,10 +76,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neural-node-labs/litecoder.git"
+    "url": "git+https://github.com/Neural-Node-Labs/litecoder.git"
   },
   "bugs": {
-    "url": "https://github.com/neural-node-labs/litecoder/issues"
+    "url": "https://github.com/Neural-Node-Labs/litecoder/issues"
   },
-  "homepage": "https://github.com/neural-node-labs/litecoder#readme"
+  "homepage": "https://github.com/Neural-Node-Labs/litecoder#readme"
 }
