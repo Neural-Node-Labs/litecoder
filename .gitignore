@@ -8,3 +8,9 @@ dist/
 .xcoder/
 *.tgz
 *.log
+# Kooder generated artifacts (managed by src/util/output-paths.ts)
+.reports/
+.tmp/
+!.kooder/blueprint.md
+!.koober/blueprint.md
+!.xcoder/blueprint.md

@@ -1,3 +1,4 @@
+<!-- xcoder:version 1 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:56:33.088Z | xcoder:subtask document-st-f0b4c9 -->
 # litecoder
 
 Give it one goal. A tool-less planner breaks it into subtasks, then concurrent ReAct worker
@@ -104,6 +105,30 @@ litecoder "<goal>"
 Reports are flat and JSON round-trip safe: overall `status` (`completed` | `partial` | `failed`),
 per-subtask `status`, `attempts`, `filesTouched`, `tokenUsage`, and a `history[]` with one record
 per attempt.
+
+## Document & media tools
+
+Workers can also read, create and update real documents — no document library and no
+subprocess required:
+
+| tool | extensions | ops |
+| --- | --- | --- |
+| `excel` | `.xlsx` `.xlsm` | read, create, update |
+| `word` | `.docx` `.docm` | read, create, update |
+| `pdf` | `.pdf` | read, create, update |
+| `image` | `.png` `.jpg` `.jpeg` | read, create, update |
+| `slides` | `.pptx` `.pptm` | read, create, update |
+| `video` | `.mp4` `.mov` `.webm` `.mkv` `.avi` | read, update |
+
+Paths are workspace-relative, the format is verified from the file's leading bytes (an
+extension that lies is refused, never converted), and nothing is overwritten without an
+explicit `overwrite: true`. Encrypted documents are reported, not cracked; video is read
+as container metadata and never re-encoded.
+
+`new_tools_handoff/` is a language-neutral porting package for this surface — JSON Schema
+plus 14 executable round-trip cases — so the same tools can be replicated in another
+program. Regenerate it with `npm run handoff:gen`; see `.xcoder/blueprint.md` for the
+architecture and `CHANGELOG.md` for what changed.
 
 ## Configuration
 

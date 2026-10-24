@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xcoder:document-tools:common-result:1",
+  "title": "document tool result",
+  "description": "The output payload returned under the standard { tool, ok, output } envelope.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "ok"
+      ],
+      "properties": {
+        "ok": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    {
+      "type": "object",
+      "required": [
+        "ok",
+        "code",
+        "error"
+      ],
+      "properties": {
+        "ok": {
+          "const": false
+        },
+        "code": {
+          "enum": [
+            "workspace_escape",
+            "file_not_found",
+            "read_error",
+            "write_error",
+            "format_mismatch",
+            "unsupported_format",
+            "corrupt_input",
+            "invalid_input",
+            "invalid_op",
+            "limit_exceeded",
+            "overwrite_refused",
+            "password_protected",
+            "unsupported_feature"
+          ]
+        },
+        "error": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  ]
+}

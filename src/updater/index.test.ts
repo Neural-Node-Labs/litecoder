@@ -1,3 +1,4 @@
+// xcoder:version 1 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:48:40.105Z | xcoder:subtask test-st-bfa3d9
 /**
  * Unit tests for the Auto-Update Module — src/updater/index.ts
  * Part of the desktop installer pipeline (§3.5 of design).
@@ -366,7 +367,9 @@ describe('checkForUpdate', () => {
       expect.any(String),
       expect.objectContaining({
         headers: expect.objectContaining({
-          'User-Agent': 'xcoder-updater/2.5.3',
+          // Rebranded in source: the updater now identifies as kooder-updater
+          // (asset names stay xcoder-*, so only the header changed).
+          'User-Agent': 'kooder-updater/2.5.3',
         }),
       }),
     );

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xcoder:document-tools:video:1",
+  "title": "video tool request",
+  "description": "Read container metadata for a video file, or replace it wholesale.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "read"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "update"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "copyFrom": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path",
+        "copyFrom"
+      ]
+    }
+  ]
+}

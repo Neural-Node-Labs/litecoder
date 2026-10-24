@@ -1,0 +1,33 @@
+{
+  "note": "Pinned allowlist. No document-format library and no subprocess is permitted.",
+  "dependencies": [
+    {
+      "name": "zod",
+      "version": "^4.4.3",
+      "role": "request schema validation (discriminated union on op)",
+      "license": "MIT",
+      "required": true
+    },
+    {
+      "name": "zlib",
+      "version": "language builtin",
+      "role": "DEFLATE for OOXML parts and PNG IDAT",
+      "license": "builtin",
+      "required": true
+    },
+    {
+      "name": "sha256",
+      "version": "language builtin",
+      "role": "digest of written bytes (integrity reporting, not authentication)",
+      "license": "builtin",
+      "required": true
+    },
+    {
+      "name": "filesystem",
+      "version": "language builtin",
+      "role": "contained reads and temp-then-rename writes",
+      "license": "builtin",
+      "required": true
+    }
+  ]
+}

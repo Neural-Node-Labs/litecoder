@@ -48,6 +48,7 @@
     "dev:litecoder": "tsx src/litecoder/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
+    "handoff:gen": "tsx src/tools/document/gen-handoff-cli.ts",
     "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {

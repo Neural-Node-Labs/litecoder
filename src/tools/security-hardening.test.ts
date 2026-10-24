@@ -1,3 +1,4 @@
+// xcoder:version 2 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:38:02.928Z | xcoder:subtask test-st-bfa3d9
 import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
@@ -8,6 +9,25 @@ import { resolveCredential, CredentialResolutionError } from "./credential.js";
 import { withEmbeddedToken } from "./github-tool.js";
 import { isDenied } from "./shell-tool.js";
 import { scheduleCron, scheduleOnce } from "./scheduleTool.js";
+
+const symlinksSupported = (() => {
+  const probeDir = fs.mkdtempSync(path.join(os.tmpdir(), "symlink-probe-"));
+  try {
+    const target = path.join(probeDir, "target");
+    fs.mkdirSync(target);
+    fs.symlinkSync(target, path.join(probeDir, "link"), "dir");
+    return true;
+  } catch {
+    return false;
+  } finally {
+    fs.rmSync(probeDir, { recursive: true, force: true });
+  }
+})();
+
+// On Windows without Developer Mode the OS refuses symlink creation, which
+// would make the containment assertions fail inside their own arrange step.
+// Probe for real (Windows *can* do this with the privilege) and skip honestly.
+const itWithSymlinks = symlinksSupported ? it : it.skip;
 
 describe("resolveInWorkspaceSafe", () => {
   let root: string;
@@ -27,21 +47,21 @@ describe("resolveInWorkspaceSafe", () => {
   it("blocks ..", () => {
     expect(() => resolveInWorkspaceSafe(root, "../x")).toThrow(/outside the workspace root/);
   });
-  it("blocks a symlinked directory pointing outside (read and create-through)", () => {
+  itWithSymlinks("blocks a symlinked directory pointing outside (read and create-through)", () => {
     fs.symlinkSync(outside, path.join(root, "link"), "dir");
     expect(() => resolveInWorkspaceSafe(root, "link/secret.txt")).toThrow(/symlink/);
     expect(() => resolveInWorkspaceSafe(root, "link/new/file.txt")).toThrow(/symlink/);
   });
-  it("blocks a symlinked file pointing outside", () => {
+  itWithSymlinks("blocks a symlinked file pointing outside", () => {
     fs.writeFileSync(path.join(outside, "s"), "x");
     fs.symlinkSync(path.join(outside, "s"), path.join(root, "f"));
     expect(() => resolveInWorkspaceSafe(root, "f")).toThrow(/symlink/);
   });
-  it("blocks a dangling symlink", () => {
+  itWithSymlinks("blocks a dangling symlink", () => {
     fs.symlinkSync(path.join(outside, "does-not-exist"), path.join(root, "dangling"));
     expect(() => resolveInWorkspaceSafe(root, "dangling")).toThrow(/dangling symlink/);
   });
-  it("allows a symlink that stays inside the workspace", () => {
+  itWithSymlinks("allows a symlink that stays inside the workspace", () => {
     fs.mkdirSync(path.join(root, "real"));
     fs.symlinkSync(path.join(root, "real"), path.join(root, "alias"), "dir");
     expect(() => resolveInWorkspaceSafe(root, "alias/x.txt")).not.toThrow();

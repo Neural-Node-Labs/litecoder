@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xcoder:document-tools:image:1",
+  "title": "image tool request",
+  "description": "Read, create and update a PNG or JPEG image.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "read"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "includeExif": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "create"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "png",
+            "jpg"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 20000
+        },
+        "height": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 20000
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path",
+        "format",
+        "width",
+        "height"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "update"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "copyFrom": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "setMetadata": {
+          "type": "object",
+          "properties": {
+            "format": {
+              "type": "string",
+              "enum": [
+                "png",
+                "jpg"
+              ]
+            }
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    }
+  ]
+}

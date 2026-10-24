@@ -1,3 +1,4 @@
+// xcoder:version 5 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:51:31.990Z | xcoder:subtask test-st-bfa3d9
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
@@ -5,28 +6,50 @@ import path from "node:path";
 
 describe("untrusted project .env", () => {
   const touched = ["NODE_OPTIONS", "PATH_SHADOW", "ANTHROPIC_BASE_URL", "OPENAI_BASE_URL", "SAFE_PROJECT_VAR", "SHELL_WINS", "KOODER_HOME"];
-  let cwd0: string;
   let home0: string | undefined;
+  // Windows resolves os.homedir() from USERPROFILE, POSIX from HOME. Both must
+  // be captured and restored, or later files in this worker inherit a temp home
+  // that teardown has already deleted.
+  let userProfile0: string | undefined;
   let proj: string;
   let home: string;
   const saved: Record<string, string | undefined> = {};
+  // Importing loadConfig.js runs module-level env loading (loadKooderEnv +
+  // applyUserConfig), which writes into process.env. Snapshot the whole
+  // environment so this test proves the loader's behaviour without leaking
+  // variables into the other files that share this worker.
+  let env0: NodeJS.ProcessEnv = {};
 
   beforeEach(() => {
+    env0 = { ...process.env };
     for (const k of touched) saved[k] = process.env[k];
-    cwd0 = process.cwd();
     home0 = process.env.HOME;
+    userProfile0 = process.env.USERPROFILE;
     proj = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "proj-")));
     home = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "home-")));
     process.env.HOME = home;
     process.env.USERPROFILE = home;
-    process.chdir(proj);
+    // A real chdir is unavailable under vitest's vmThreads pool, and the loader
+    // only ever asks process.cwd() for the project directory — so point cwd at
+    // the fixture project instead. Same intent, no process-global side effect.
+    vi.spyOn(process, "cwd").mockReturnValue(proj);
   });
   afterEach(() => {
-    process.chdir(cwd0);
-    if (home0 === undefined) delete process.env.HOME; else process.env.HOME = home0;
+    vi.mocked(process.cwd).mockRestore();
+    // Restore the environment exactly: the loader under test legitimately sets
+    // variables, and any that survived would corrupt later files in this worker
+    // (e.g. config-command snapshots the shell env at import time).
+    for (const k of Object.keys(process.env)) {
+      if (!(k in env0)) delete process.env[k];
+    }
+    for (const [k, v] of Object.entries(env0)) {
+      if (process.env[k] !== v) process.env[k] = v;
+    }
     for (const k of touched) {
       if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
     }
+    if (home0 === undefined) delete process.env.HOME; else process.env.HOME = home0;
+    if (userProfile0 === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = userProfile0;
     fs.rmSync(proj, { recursive: true, force: true });
     fs.rmSync(home, { recursive: true, force: true });
     vi.resetModules();

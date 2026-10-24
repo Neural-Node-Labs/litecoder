@@ -1,4 +1,4 @@
-// xcoder:version 7 | xcoder:task task-7fc1d4 | xcoder:updated 2026-10-17T12:30:55.130Z | xcoder:subtask code-st-1a0810
+// xcoder:version 4 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:25:45.856Z | xcoder:subtask code-st-39dbde
 import { readFileTool, writeFileTool, listDirTool, readOutlineTool, readMultipleFilesTool, readFullFileTool } from "./fs-tools.js";
 import { linePatchTool } from "./patch-tools.js";
 import { gitDiffTool, gitLogTool, applyUnifiedDiffTool } from "./git-tools.js";
@@ -20,6 +20,8 @@ import { githubCreateRepo, githubClone, githubCommit, githubPush } from "./githu
 import { loadSkillTool, type LoadSkillInput } from "./load-skill-tool.js";
 import { sedTool, type SedToolInput } from "./sed-tool.js";
 import { crawlSiteMap, formatSiteMap } from "./siteCrawlerTool.js";
+import { documentManifestEntries, DOCUMENT_TOOLS } from "./document/format-registry.js";
+import { handleDocumentTool } from "./document/tool-handler.js";
 
 export interface ToolManifestEntry {
   name: string;
@@ -218,6 +220,8 @@ export const TOOL_MANIFEST: ToolManifestEntry[] = [
       PROMPT_GUIDANCE.validateAfterEdit,
     inputHint: '{ "path": "src/a.ts", "lang": "typescript" }',
   },
+  // ── document / media surface (six tools, one shared handler) ──────────
+  ...documentManifestEntries(),
 ];
 
 /**
@@ -278,6 +282,14 @@ const REQUIRED_STRING_FIELDS: Record<string, string[]> = {
   update_function: ["path", "functionName", "newCode"],
   rename_symbol: ["path", "name", "newName"],
   validate_file: ["path"],
+  // Document tools: `path` and `op` are the two fields every request needs;
+  // the per-op payload is then validated by the tool's own zod schema.
+  excel: ["path", "op"],
+  word: ["path", "op"],
+  pdf: ["path", "op"],
+  image: ["path", "op"],
+  slides: ["path", "op"],
+  video: ["path", "op"],
 };
 
 function validateInput(toolName: string, input: unknown): string | null {
@@ -554,6 +566,20 @@ async function dispatchToolInner(
       case "validate_file": {
         const { path, lang } = input as { path: string; lang?: string };
         const result = await validateFileTool(root, path, lang);
+        return { tool: toolName, ok: result.ok, output: result };
+      }
+      // ── document / media surface ──────────────────────────────────────
+      // Six thin cases over ONE shared handler. The handling itself (schema
+      // validation, containment, magic-byte check, atomic write) is identical
+      // for every format, so duplicating it six times would only create six
+      // places for the security contract to drift.
+      case "excel":
+      case "word":
+      case "pdf":
+      case "image":
+      case "slides":
+      case "video": {
+        const result = await handleDocumentTool(root, toolName, input, ctx);
         return { tool: toolName, ok: result.ok, output: result };
       }
       default:

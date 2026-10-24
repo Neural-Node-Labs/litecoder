@@ -1,0 +1,10 @@
+{
+  "handoffVersion": "1.0.0",
+  "protocolVersion": "1",
+  "sourceRepo": "Neural-Node-Labs/litecoder",
+  "sourceVersion": "3.0.2",
+  "sourceCommit": "5769b4e",
+  "generatedAt": "2026-10-17T00:00:00.000Z",
+  "generator": "src/tools/document/handoff-generator.ts",
+  "language": "language-neutral (JSON Schema + declarative cases)"
+}

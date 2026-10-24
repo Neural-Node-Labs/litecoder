@@ -1,0 +1,412 @@
+{
+  "handoffVersion": "1.0.0",
+  "protocolVersion": "1",
+  "cases": [
+    {
+      "id": "excel-create-read-update",
+      "tool": "excel",
+      "intent": "Create a workbook, read it back, then change one cell.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "book.xlsx",
+          "sheets": [
+            {
+              "name": "Sheet1",
+              "rows": [
+                [
+                  "name",
+                  "score"
+                ],
+                [
+                  "ada",
+                  42
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "op": "read",
+          "path": "book.xlsx"
+        },
+        {
+          "op": "update",
+          "path": "book.xlsx",
+          "edits": [
+            {
+              "sheet": "Sheet1",
+              "cell": "B2",
+              "value": 43
+            }
+          ],
+          "overwrite": true
+        },
+        {
+          "op": "read",
+          "path": "book.xlsx"
+        }
+      ],
+      "expect": {
+        "finalSheetName": "Sheet1",
+        "finalCellB2": 43,
+        "finalCellA2": "ada"
+      }
+    },
+    {
+      "id": "excel-overwrite-guard",
+      "tool": "excel",
+      "intent": "A second create without overwrite must be refused, not silently applied.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "dup.xlsx",
+          "sheets": [
+            {
+              "name": "S",
+              "rows": [
+                [
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "op": "create",
+          "path": "dup.xlsx",
+          "sheets": [
+            {
+              "name": "S",
+              "rows": [
+                [
+                  2
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "lastError": "overwrite_refused"
+      }
+    },
+    {
+      "id": "word-create-append",
+      "tool": "word",
+      "intent": "Create a document with a heading, then append a paragraph.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "doc.docx",
+          "paragraphs": [
+            {
+              "text": "Title",
+              "style": "Heading1"
+            },
+            {
+              "text": "Body"
+            }
+          ]
+        },
+        {
+          "op": "read",
+          "path": "doc.docx",
+          "includeOutline": true
+        },
+        {
+          "op": "update",
+          "path": "doc.docx",
+          "append": [
+            {
+              "text": "Tail"
+            }
+          ],
+          "overwrite": true
+        },
+        {
+          "op": "read",
+          "path": "doc.docx"
+        }
+      ],
+      "expect": {
+        "initialParagraphs": [
+          "Title",
+          "Body"
+        ],
+        "outlineFirst": "Title",
+        "finalParagraphsInclude": "Tail"
+      }
+    },
+    {
+      "id": "word-replace-text",
+      "tool": "word",
+      "intent": "Find/replace inside a paragraph.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "r.docx",
+          "paragraphs": [
+            {
+              "text": "hello world"
+            }
+          ]
+        },
+        {
+          "op": "update",
+          "path": "r.docx",
+          "replace": [
+            {
+              "find": "world",
+              "replace": "there"
+            }
+          ],
+          "overwrite": true
+        },
+        {
+          "op": "read",
+          "path": "r.docx"
+        }
+      ],
+      "expect": {
+        "finalParagraphs": [
+          "hello there"
+        ]
+      }
+    },
+    {
+      "id": "pdf-create-read-append",
+      "tool": "pdf",
+      "intent": "Create a one-page PDF, read its text layer, append a page.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "n.pdf",
+          "pages": [
+            {
+              "text": "first page"
+            }
+          ],
+          "metadata": {
+            "title": "Notes"
+          }
+        },
+        {
+          "op": "read",
+          "path": "n.pdf"
+        },
+        {
+          "op": "update",
+          "path": "n.pdf",
+          "appendPages": [
+            {
+              "text": "second page"
+            }
+          ],
+          "overwrite": true
+        },
+        {
+          "op": "read",
+          "path": "n.pdf"
+        }
+      ],
+      "expect": {
+        "initialPageCount": 1,
+        "hasTextLayer": true,
+        "initialTextContains": "first page",
+        "finalPageCount": 2
+      }
+    },
+    {
+      "id": "pdf-encrypted-refused",
+      "tool": "pdf",
+      "intent": "An /Encrypt entry must be reported as password_protected.",
+      "steps": [
+        {
+          "op": "read",
+          "path": "locked.pdf"
+        }
+      ],
+      "expect": {
+        "lastError": "password_protected"
+      }
+    },
+    {
+      "id": "image-create-read",
+      "tool": "image",
+      "intent": "Create a solid PNG and read its dimensions.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "px.png",
+          "format": "png",
+          "width": 8,
+          "height": 5,
+          "background": "#3366cc"
+        },
+        {
+          "op": "read",
+          "path": "px.png"
+        }
+      ],
+      "expect": {
+        "format": "png",
+        "width": 8,
+        "height": 5,
+        "exifAbsent": true
+      }
+    },
+    {
+      "id": "image-jpeg-create-refused",
+      "tool": "image",
+      "intent": "JPEG creation must fail loudly rather than emit a mislabelled PNG.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "photo.jpg",
+          "format": "jpg",
+          "width": 4,
+          "height": 4
+        }
+      ],
+      "expect": {
+        "lastError": "unsupported_feature"
+      }
+    },
+    {
+      "id": "slides-create-read-update",
+      "tool": "slides",
+      "intent": "Create a two-slide deck, read titles, rename the first slide.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "deck.pptx",
+          "slides": [
+            {
+              "title": "Intro",
+              "bullets": [
+                "one",
+                "two"
+              ]
+            },
+            {
+              "title": "Second",
+              "bullets": [
+                "three"
+              ]
+            }
+          ]
+        },
+        {
+          "op": "read",
+          "path": "deck.pptx"
+        },
+        {
+          "op": "update",
+          "path": "deck.pptx",
+          "slide": 1,
+          "setText": [
+            {
+              "text": "Renamed"
+            }
+          ],
+          "overwrite": true
+        },
+        {
+          "op": "read",
+          "path": "deck.pptx"
+        }
+      ],
+      "expect": {
+        "slideCount": 2,
+        "firstTitleInitial": "Intro",
+        "firstTitleFinal": "Renamed"
+      }
+    },
+    {
+      "id": "video-create-refused",
+      "tool": "video",
+      "intent": "There is no create op — encoding is out of scope.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "a.mp4"
+        }
+      ],
+      "expect": {
+        "lastError": "invalid_input"
+      }
+    },
+    {
+      "id": "video-read-mp4",
+      "tool": "video",
+      "intent": "Read container metadata from a minimal ISO-BMFF file without throwing.",
+      "steps": [
+        {
+          "op": "read",
+          "path": "clip.mp4"
+        }
+      ],
+      "expect": {
+        "container": "mp4",
+        "parseWarningsIsArray": true
+      }
+    },
+    {
+      "id": "security-format-mismatch",
+      "tool": "pdf",
+      "intent": "A PNG renamed to .pdf must be rejected on magic bytes, not parsed as a PDF.",
+      "steps": [
+        {
+          "op": "read",
+          "path": "notreally.pdf"
+        }
+      ],
+      "expect": {
+        "lastError": "format_mismatch"
+      }
+    },
+    {
+      "id": "security-workspace-escape",
+      "tool": "excel",
+      "intent": "A path escaping the workspace must be refused before any I/O.",
+      "steps": [
+        {
+          "op": "read",
+          "path": "../outside.xlsx"
+        }
+      ],
+      "expect": {
+        "lastError": "workspace_escape"
+      }
+    },
+    {
+      "id": "security-overwrite-refused",
+      "tool": "word",
+      "intent": "update without overwrite true must not replace an existing file.",
+      "steps": [
+        {
+          "op": "create",
+          "path": "keep.docx",
+          "paragraphs": [
+            {
+              "text": "original"
+            }
+          ]
+        },
+        {
+          "op": "update",
+          "path": "keep.docx",
+          "append": [
+            {
+              "text": "nope"
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "lastError": "overwrite_refused"
+      }
+    }
+  ]
+}

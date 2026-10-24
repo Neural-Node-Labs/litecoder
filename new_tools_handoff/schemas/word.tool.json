@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xcoder:document-tools:word:1",
+  "title": "word tool request",
+  "description": "Read, create and update a Word document (.docx / .docm).",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "read"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "includeOutline": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "create"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "paragraphs": {
+          "minItems": 1,
+          "maxItems": 5000,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 20000
+              },
+              "style": {
+                "type": "string",
+                "enum": [
+                  "Normal",
+                  "Heading1",
+                  "Heading2",
+                  "Heading3",
+                  "Quote"
+                ]
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path",
+        "paragraphs"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "update"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "append": {
+          "maxItems": 2000,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 20000
+              },
+              "style": {
+                "type": "string",
+                "maxLength": 40
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        },
+        "replace": {
+          "maxItems": 200,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "find": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "replace": {
+                "type": "string",
+                "maxLength": 20000
+              },
+              "all": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "find",
+              "replace"
+            ]
+          }
+        },
+        "insertAfter": {
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 20000
+              },
+              "style": {
+                "type": "string",
+                "maxLength": 40
+              }
+            },
+            "required": [
+              "index",
+              "text"
+            ]
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    }
+  ]
+}

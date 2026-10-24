@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:xcoder:document-tools:pdf:1",
+  "title": "pdf tool request",
+  "description": "Read, create and update a PDF (.pdf).",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "read"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "maxPages": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "create"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "pages": {
+          "minItems": 1,
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 20000
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "author": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "subject": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "keywords": {
+              "type": "string",
+              "maxLength": 512
+            }
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path",
+        "pages"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "update"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "appendPages": {
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 20000
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        },
+        "mergeFrom": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "author": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "subject": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "keywords": {
+              "type": "string",
+              "maxLength": 512
+            }
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "op",
+        "path"
+      ]
+    }
+  ]
+}

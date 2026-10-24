@@ -1,0 +1,93 @@
+{
+  "handoffVersion": "1.0.0",
+  "sourceCommit": "5769b4e",
+  "note": "Extensions are hints; the format is always decided by magic bytes.",
+  "tools": [
+    {
+      "tool": "excel",
+      "extensions": [
+        ".xlsx",
+        ".xlsm"
+      ],
+      "ops": [
+        "read",
+        "create",
+        "update"
+      ],
+      "createSupported": true,
+      "responseShape": "read -> { ok, relPath, format, sheets: [{ name, rowCount, colCount, rows, truncated }], truncated }"
+    },
+    {
+      "tool": "word",
+      "extensions": [
+        ".docx",
+        ".docm"
+      ],
+      "ops": [
+        "read",
+        "create",
+        "update"
+      ],
+      "createSupported": true,
+      "responseShape": "read -> { ok, relPath, format, paragraphs: [{ index, style, text }], outline?, truncated }"
+    },
+    {
+      "tool": "pdf",
+      "extensions": [
+        ".pdf"
+      ],
+      "ops": [
+        "read",
+        "create",
+        "update"
+      ],
+      "createSupported": true,
+      "responseShape": "read -> { ok, relPath, pageCount, pages: [{ index, text, textTruncated }], metadata, hasTextLayer, truncated }"
+    },
+    {
+      "tool": "image",
+      "extensions": [
+        ".png",
+        ".jpg",
+        ".jpeg"
+      ],
+      "ops": [
+        "read",
+        "create",
+        "update"
+      ],
+      "createSupported": true,
+      "responseShape": "read -> { ok, relPath, format, width, height, hasAlpha, colorType, bitDepth, exif? }"
+    },
+    {
+      "tool": "slides",
+      "extensions": [
+        ".pptx",
+        ".pptm"
+      ],
+      "ops": [
+        "read",
+        "create",
+        "update"
+      ],
+      "createSupported": true,
+      "responseShape": "read -> { ok, relPath, format, slideCount, slides: [{ index, title, texts }], truncated }"
+    },
+    {
+      "tool": "video",
+      "extensions": [
+        ".mp4",
+        ".mov",
+        ".webm",
+        ".mkv",
+        ".avi"
+      ],
+      "ops": [
+        "read",
+        "update"
+      ],
+      "createSupported": false,
+      "responseShape": "read -> { ok, relPath, container, durationMs?, width?, height?, videoCodec?, audioCodec?, bitrateKbps?, bytes, parseWarnings }"
+    }
+  ]
+}
