@@ -1,5 +1,27 @@
-<!-- xcoder:version 1 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:56:17.229Z | xcoder:subtask document-st-f0b4c9 -->
+<!-- xcoder:version 2 | xcoder:task task-ae8e62 | xcoder:updated 2026-10-30T18:04:25.388Z | xcoder:subtask code-st-f128c5 -->
 # Changelog
+
+## [3.1.1]
+
+### Changed
+
+- **`sentinel` is now its own CLI.** `npm install -g litecoder` installs a `sentinel`
+  bin (`dist/sentinel/bin.js`) that presents as `sentinel [options]` and owns `--version`.
+  `litecoder sentinel …` still works, mounting the identical command definition from
+  `src/sentinel/cli.ts`, so the two surfaces cannot drift.
+- **`sentinel --config <path>` now reads the file.** The option was registered and
+  documented but the action called `loadSentinelConfig(process.env, undefined)`,
+  silently ignoring the path. It is now read and passed through; `SENTINEL_ADMIN_IP`
+  still comes from the environment.
+- **README: usage and Sentinel documented.** Added the `litecoder [options] <goal>`
+  synopsis with a full option table and exit codes, plus a `## Sentinel` section with
+  quick-start examples (`sentinel --once`, `--no-dry-run`, `--approve <id>`) and a
+  pointer to `docs/SENTINEL.md`.
+- **README: corrected the `litecoder --config` rows.** That flag is registered only on
+  `kooder`/`worker`, never on the root `litecoder` program; the quick-start and usage
+  table now attribute it to `kooder --config`.
+- Version bumped to **3.1.1** across `package.json`, `src/version.ts`,
+  `src/tools/document/handoff-content.ts` and the CLI headers.
 
 ## [Unreleased] — Sentinel: the always-on security daemon
 

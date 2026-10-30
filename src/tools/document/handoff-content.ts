@@ -1,4 +1,4 @@
-// xcoder:version 1 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:27:35.971Z | xcoder:subtask code-st-39dbde
+// xcoder:version 2 | xcoder:task litecoder-1793381927596 | xcoder:updated 2026-10-30T17:47:32.240Z | xcoder:subtask bump-version-3-1-1
 import type { FormatFamily } from "./types.js";
 
 /**
@@ -17,7 +17,7 @@ import type { FormatFamily } from "./types.js";
 /** Pinned source revision the handoff describes. Bumping this is a deliberate act. */
 export const SOURCE_REPO = "Neural-Node-Labs/litecoder";
 export const SOURCE_COMMIT = "5769b4e";
-export const SOURCE_VERSION = "3.0.2";
+export const SOURCE_VERSION = "3.1.1";
 export const HANDOFF_VERSION = "1.0.0";
 export const PROTOCOL_VERSION = "1";
 

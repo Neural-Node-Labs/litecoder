@@ -1,7 +1,7 @@
-<!-- xcoder:version 1 | xcoder:task task-239998 | xcoder:updated 2026-10-30T17:13:09.499Z | xcoder:subtask document-st-c10e76 -->
+<!-- xcoder:version 4 | xcoder:task task-ae8e62 | xcoder:updated 2026-10-30T18:04:26.808Z | xcoder:subtask code-st-f128c5 -->
 # Sentinel — the always-on log-monitoring security daemon
 
-Status: shipped in `litecoder` 3.0.2 · source `src/sentinel/` · CLI `litecoder sentinel`
+Status: shipped in `litecoder` 3.1.1 · source `src/sentinel/` · CLI `sentinel` (also `litecoder sentinel`)
 
 This document exists so that someone who was not in the build conversation can
 answer three questions: **what exists, why it is shaped that way, and how to
@@ -21,7 +21,9 @@ Concretely:
 
 | integration point | file | what it does |
 |---|---|---|
-| CLI subcommand | `src/sentinel/cli.ts` | `registerSentinelCommand(program)` |
+| command definition | `src/sentinel/cli.ts` | `createSentinelCommand({ standalone?, programLabel? })` — single source of truth for options + the action |
+| standalone bin | `src/sentinel/bin.ts` → `dist/sentinel/bin.js` (`bin.sentinel`) | parses `createSentinelCommand({ standalone: true })`, owns `--version` |
+| CLI subcommand | `src/sentinel/cli.ts` | `registerSentinelCommand(program)` → `program.addCommand(createSentinelCommand())` |
 | registered from | `src/litecoder/cli.ts:31,223` | the planner's positional-goal contract is untouched |
 | SDLC role | `src/skills/directives.ts:261` (`ROLE_DIRECTIVES.sentinel`) | adds `"sentinel"` to `ROLES` in `src/types.ts`; the `Record<Role, RoleDirective>` type makes `npm run typecheck` fail until the directive exists |
 | LLM transport | `createLlmClient('sub_agent')`, `src/llm/factory.ts` | reuses the existing client; no second transport was introduced |

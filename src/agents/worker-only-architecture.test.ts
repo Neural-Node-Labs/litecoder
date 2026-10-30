@@ -1,4 +1,4 @@
-// xcoder:version 1 | xcoder:task task-1f0256 | xcoder:updated 2026-10-17T14:35:18.633Z | xcoder:subtask code-st-9de79a
+// xcoder:version 1 | xcoder:task litecoder-1793381927596 | xcoder:updated 2026-10-30T17:42:52.921Z | xcoder:subtask implement-sentinel-cli
 // Tests for the intended post-cleanup Kooder architecture.
 //
 // Oracle for these assertions is the task goal, not the current code:
@@ -85,12 +85,14 @@ describe('Kooder rebrand', () => {
 
     expect(pkg.bin.kooder).toBe('./dist/cli-worker.js');
     expect(pkg.bin.worker).toBe('./dist/cli-worker.js');
-    // `litecoder` is a deliberate third bin: a thin, no-tools planner CLI on
-    // top of the same worker engine. It is NOT a pre-rebrand alias, so the
-    // intent this assertion protects (no `koober` bin surviving) is unchanged
-    // — see .xcoder/backlog/litecoder-design.md §0.
+    // `litecoder` and `sentinel` are deliberate extra bins: a thin, no-tools
+    // planner CLI on top of the same worker engine, and the log-monitoring
+    // security daemon (`docs/SENTINEL.md`). They are NOT pre-rebrand aliases,
+    // so the intent this assertion protects (no `koober` bin surviving) is
+    // unchanged — see .xcoder/backlog/litecoder-design.md §0.
     expect(pkg.bin.litecoder).toBe('./dist/litecoder/cli.js');
-    expect(Object.keys(pkg.bin).sort()).toEqual(['kooder', 'litecoder', 'worker']);
+    expect(pkg.bin.sentinel).toBe('./dist/sentinel/bin.js');
+    expect(Object.keys(pkg.bin).sort()).toEqual(['kooder', 'litecoder', 'sentinel', 'worker']);
     expect(pkg.bin).not.toHaveProperty('koober');
   });
 

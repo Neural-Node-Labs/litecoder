@@ -1,4 +1,4 @@
-// xcoder:version 1 | xcoder:task task-1f0256 | xcoder:updated 2026-10-17T14:39:36.844Z | xcoder:subtask code-st-9de79a
+// xcoder:version 1 | xcoder:task litecoder-1793381927596 | xcoder:updated 2026-10-30T17:42:51.031Z | xcoder:subtask implement-sentinel-cli
 // Tests for the `rebrand to kooder` goal, written against the INTENDED
 // behaviour rather than the current implementation:
 //   * the product name on every user-facing surface is "kooder" / "Kooder"
@@ -126,13 +126,15 @@ describe('Kooder rebrand — published bins', () => {
   it('publishes the kooder and worker bins on the worker CLI, plus the litecoder bin', () => {
     const pkg = readPkg();
 
-    // `litecoder` is a deliberate third bin (a no-tools planner CLI on top of
-    // the same worker engine), not a pre-rebrand alias — the assertion below
-    // still guarantees no legacy brand survived as a bin.
-    expect(Object.keys(pkg.bin).sort()).toEqual(['kooder', 'litecoder', 'worker']);
+    // `litecoder` and `sentinel` are deliberate extra bins (a no-tools planner
+    // CLI on top of the same worker engine, and the log-monitoring security
+    // daemon), not pre-rebrand aliases — the assertion below still guarantees
+    // no legacy brand survived as a bin.
+    expect(Object.keys(pkg.bin).sort()).toEqual(['kooder', 'litecoder', 'sentinel', 'worker']);
     expect(pkg.bin.kooder).toBe('./dist/cli-worker.js');
     expect(pkg.bin.worker).toBe('./dist/cli-worker.js');
     expect(pkg.bin.litecoder).toBe('./dist/litecoder/cli.js');
+    expect(pkg.bin.sentinel).toBe('./dist/sentinel/bin.js');
   });
 
   it('carries no pre-rebrand bin alias', () => {

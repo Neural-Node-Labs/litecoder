@@ -1,6 +1,6 @@
 {
   "name": "litecoder",
-  "version": "3.0.2",
+  "version": "3.1.1",
   "description": "Plan one goal with a tool-less orchestrator, then delegate subtasks to concurrent ReAct worker agents (Kooder engine) from the command line.",
   "keywords": [
     "cli",
@@ -27,6 +27,7 @@
   },
   "bin": {
     "litecoder": "./dist/litecoder/cli.js",
+    "sentinel": "./dist/sentinel/bin.js",
     "kooder": "./dist/cli-worker.js",
     "worker": "./dist/cli-worker.js"
   },
@@ -46,6 +47,7 @@
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "dev": "tsx src/cli-worker.ts",
     "dev:litecoder": "tsx src/litecoder/cli.ts",
+    "dev:sentinel": "tsx src/sentinel/bin.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "regression": "vitest run",

@@ -6,3 +6,14 @@
 /.xcoder/
 /.log/
 
+# Kooder generated artifacts (managed by src/util/output-paths.ts)
+.reports/
+.tmp/
+.kooder/
+.koober/
+.xcoder/
+!.kooder/blueprint.md
+!.koober/blueprint.md
+!.xcoder/blueprint.md
+
+/new_tools_handoff/
