@@ -1,4 +1,4 @@
-<!-- xcoder:version 24 | xcoder:task task-5f5358 | xcoder:updated 2026-10-30T18:17:19.949Z | xcoder:subtask test-st-a10394 -->
+<!-- xcoder:version 27 | xcoder:task task-5f5358 | xcoder:updated 2026-10-30T18:21:30.420Z | xcoder:subtask test-st-a10394 -->
 # litecoder
 
 Give it one goal. A tool-less planner breaks it into subtasks, then concurrent ReAct worker
@@ -461,8 +461,10 @@ matching the registry.
 | `video` | Read container metadata for a video, or replace it wholesale via `update`. | `{ "op": "read", "path": "media/demo.mp4" }` | — |
 
 Tools that touch the network or a third party never take a secret as a parameter: `ui_test`,
-`browse`, `api_test` and the `github_*` tools take a `credentialRef` (the name of an environment
-variable) or read `GITHUB_TOKEN` from the environment. The six document tools are described in
+`browse`, `api_test`, `github_create_repo` and `github_push` take a `credentialRef` (the name of an
+environment variable) or read `GITHUB_TOKEN` from the environment. `github_clone` accepts a
+`credentialRef` only for a private repository, and `github_commit` needs no credential at all — it
+only runs `git add` and `git commit` locally. The six document tools are described in
 more detail — extensions, limits and ops — in [Document & media tools](#document--media-tools).
 
 ### sentinel — approval-gated firewall tools
