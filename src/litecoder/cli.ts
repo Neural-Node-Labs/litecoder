@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// xcoder:version 1 | xcoder:task task-1f0256 | xcoder:updated 2026-10-17T14:37:04.083Z | xcoder:subtask code-st-9de79a
+// xcoder:version 2 | xcoder:task task-239998 | xcoder:updated 2026-10-30T16:32:35.905Z | xcoder:subtask code-st-8f12c6
 // `litecoder` bin — plan one goal with a tool-less planner, then delegate the
 // plan's subtasks to the existing worker engine.
 //
@@ -28,6 +28,7 @@ import {
   type LitecoderRunReport,
 } from "./report.js";
 import type { Plan } from "./plan-schema.js";
+import { registerSentinelCommand } from "../sentinel/cli.js";
 
 /** Usage errors exit 2 and never print a report. */
 class UsageError extends Error {}
@@ -218,6 +219,8 @@ program
       process.exitCode = 1;
     }
   });
+
+registerSentinelCommand(program);
 
 program.parseAsync(process.argv).catch((e: unknown) => {
   process.stderr.write(`litecoder: ${(e as Error)?.message ?? String(e)}\n`);

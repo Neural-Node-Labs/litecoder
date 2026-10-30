@@ -1,6 +1,76 @@
 <!-- xcoder:version 1 | xcoder:task task-3df952 | xcoder:updated 2026-10-24T05:56:17.229Z | xcoder:subtask document-st-f0b4c9 -->
 # Changelog
 
+## [Unreleased] — Sentinel: the always-on security daemon
+
+### What was added
+
+A new agent on the existing litecoder base: `litecoder sentinel` tails server log
+files, asks a model whether each event is suspicious, decides with code-owned policy,
+and applies an `iptables`/`netsh` block only after a human approves. Source is
+`src/sentinel/` (16 modules + 16 colocated test files). Full write-up in
+`docs/SENTINEL.md`; condensed architecture in `.xcoder/blueprint.md` §8–9.
+
+| integration point | file |
+| --- | --- |
+| `sentinel` subcommand | `src/sentinel/cli.ts` → mounted at `src/litecoder/cli.ts:31,223` |
+| SDLC role | `ROLES` (`src/types.ts`) + `ROLE_DIRECTIVES.sentinel` (`src/skills/directives.ts:261`) |
+| LLM transport | `createLlmClient('sub_agent')` — reused, not re-implemented |
+
+Ported from the Python reference in `temp/sentinel-ai/` and re-implemented in
+TypeScript: iptables/netsh tools → `system-tools.ts`, `SecureFormatter` redaction →
+`redaction.ts`, default-DENY + admin-IP safety → `policy-engine.ts`/`policy/rules.ts`
+(14 rules, stable audited ids), LangGraph state machine → the explicit cycle in
+`daemon.ts`. The ChromaDB RAG policy layer was deliberately **not** ported: nothing
+that can write a file next to the daemon should change what the daemon does.
+
+### Why these design choices
+
+- **The model classifies; it never acts.** `ModelAnalysis` has no `targetIp`, `action`,
+  `durationMinutes` or `requiresApproval`. `src/sentinel/schema.test.ts` (16 tests)
+  proves zod *strips* those keys if a model supplies them. The action surface is a
+  closed four-value enum, so an arbitrary shell command is not expressible.
+- **Fail closed.** `DEFAULT_DENY_ANALYSIS` is suspicious (`threatDetected: true`,
+  `severity: high`) but `confidence: 0`, so a failed analysis can reach a temporary,
+  approval-gated action and never a permanent one.
+- **DENY precedence by severity, not array position.** Reordering `RULES` cannot weaken
+  an outcome; a throwing rule predicate counts as not-matched.
+- **Audit before action.** If the audit write fails the firewall is never called.
+
+### Fixed during the test cycle
+
+- **Gate script.** `package.json` had no `regression` script, so the gate command failed
+  with `Missing script: "regression"` regardless of test health. Added
+  `"regression": "vitest run"`.
+- **A correct filter that selected nothing.** vitest positional args are regex filters,
+  not globs, so `"src/litecoder/**/*.test.ts"` matched 1 file. Directory filters
+  select the intended 28.
+- **defect0003 (suite flake, ~1 run in 3).** `loadConfig.ts` calls `applyUserConfig()` at
+  import time, leaking the developer’s real `~/.kooder/config.json` key into
+  `process.env`; `config-command.test.ts` then skipped the write under test. Fixed with a
+  narrow `forgetShellEnvShadow()` seam (production precedence unchanged), `afterEach`
+  cleanup, and `delete` instead of restore.
+- Verified **defect0001** (`prune()` did not decrement `this.total`) and **defect0002**
+  (`isBlocked()` never consulted the firewall) are actually fixed in source; their tests
+  are real assertions, not `it.fails`.
+
+### Verification
+
+- `npx vitest run --config vitest.config.ts src/sentinel/ src/skills/sentinel-directive.test.ts`
+  → 17 files, 129 tests, 0 failures.
+- Full suite: 106 files; 1697 passed | 1 expected fail | 35 skipped (1733).
+- `npm run typecheck` enforces the role wiring: `Record<Role, RoleDirective>` will not
+  compile until `ROLE_DIRECTIVES.sentinel` exists.
+
+### How to roll back
+
+Delete `src/sentinel/`; remove the `registerSentinelCommand` import/call at
+`src/litecoder/cli.ts:31,223`; remove `sentinel` from `ROLES` (`src/types.ts`), its entry
+in `ROLE_DIRECTIVES` (`src/skills/directives.ts:261`) and
+`src/skills/sentinel-directive.test.ts`. No firewall rule is created at build time, so a
+daemon that never runs changes nothing.
+
+---
 ## [3.0.2] — document & media tools, and the porting handoff
 
 ### What was added

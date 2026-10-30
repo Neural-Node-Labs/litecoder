@@ -1,4 +1,4 @@
-// xcoder:version 1 | xcoder:task task-a3052a | xcoder:updated 2026-10-17T13:05:54.254Z | xcoder:subtask code-st-b3a0c8
+// xcoder:version 6 | xcoder:task task-239998 | xcoder:updated 2026-10-30T17:06:23.625Z | xcoder:subtask test-st-50b14d
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { promises as fs } from "node:fs";
 import os from "node:os";
@@ -25,6 +25,11 @@ beforeEach(async () => {
   originalXcoderModel = process.env.KOODER_MODEL;
   originalDeepSeekKey = process.env.DEEPSEEK_API_KEY;
   originalConfigFile = process.env.KOODER_CONFIG_FILE;
+  // loadConfig.ts calls applyUserConfig() at import time, which can write
+  // KOODER_API_KEY from the developer's real ~/.kooder/config.json. Drop it:
+  // a vitest worker is shared, and leaving it set would make the next test
+  // file treat it as shell-exported and silently skip applying its own key.
+  delete process.env.KOODER_API_KEY;
   delete process.env.KOODER_MODEL;
   delete process.env.KOOBER_MODEL;
   delete process.env.XCODER_MODEL;
@@ -42,6 +47,10 @@ afterEach(async () => {
   else process.env.KOODER_MODEL = originalXcoderModel;
   if (originalDeepSeekKey === undefined) delete process.env.DEEPSEEK_API_KEY;
   else process.env.DEEPSEEK_API_KEY = originalDeepSeekKey;
+  // Delete rather than restore: any value here came from applyUserConfig()
+  // reading the developer's real ~/.kooder/config.json at import time, and
+  // restoring it would hand it to the next test file in this shared worker.
+  delete process.env.KOODER_API_KEY;
   if (originalConfigFile === undefined) delete process.env.KOODER_CONFIG_FILE;
   else process.env.KOODER_CONFIG_FILE = originalConfigFile;
   resetUserConfigCache();

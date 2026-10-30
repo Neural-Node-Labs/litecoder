@@ -1,4 +1,4 @@
-// xcoder:version 2 | xcoder:task task-7fc1d4 | xcoder:updated 2026-10-17T12:36:14.875Z | xcoder:subtask code-st-1a0810
+// xcoder:version 1 | xcoder:task task-239998 | xcoder:updated 2026-10-30T17:02:19.838Z | xcoder:subtask test-st-50b14d
 // User-level runtime config: <home>/.kooder/config.json
 //
 //   kooder run --config "provider=deepseek,key=…,model=deepseek-chat"
@@ -23,6 +23,17 @@ export interface UserConfig {
 
 /** Variables that were really exported in the shell — config.json never overrides these. */
 const shellKeys = new Set(Object.keys(process.env));
+
+/**
+ * Test seam: declare that `name` was NOT exported by the shell, so
+ * `applyUserConfig()` may write it. Production code has no reason to call
+ * this; tests need it because module-load snapshots are shared across files
+ * in one worker, and a variable set by an earlier file would otherwise look
+ * permanently shell-owned and silently suppress the write under test.
+ */
+export function forgetShellEnvShadow(name: string): void {
+  shellKeys.delete(name);
+}
 
 export const PROVIDER_KEY_ENV: Record<UserProvider, string> = {
   deepseek: "DEEPSEEK_API_KEY",

@@ -1,4 +1,4 @@
-// xcoder:version 1 | xcoder:task task-1f0256 | xcoder:updated 2026-10-17T14:35:14.939Z | xcoder:subtask code-st-9de79a
+// xcoder:version 1 | xcoder:task task-239998 | xcoder:updated 2026-10-30T16:32:05.629Z | xcoder:subtask code-st-8f12c6
 /**
  * Core contracts. Everything else in this codebase is built around these
  * shapes — the same principle Agent Factory's `af-shared-contracts` repo
@@ -48,6 +48,7 @@ export const ROLES = [
   "scrum-master",
   "system-architect",
   "security-lead",
+  "sentinel",
 ] as const;
 
 export type Role = (typeof ROLES)[number];

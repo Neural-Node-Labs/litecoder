@@ -1,4 +1,4 @@
-// xcoder:version 2 | xcoder:task task-2aad09 | xcoder:updated 2026-08-05T04:48:00.525Z | xcoder:subtask code-st-490f5e
+// xcoder:version 1 | xcoder:task task-239998 | xcoder:updated 2026-10-30T16:32:20.790Z | xcoder:subtask code-st-8f12c6
 import { describe, it, expect } from 'vitest';
 import { ROLE_DIRECTIVES, BA_REQUIREMENTS_DIRECTIVE } from './directives.js';
 import type { Role } from '../types.js';
@@ -19,6 +19,7 @@ describe('ROLE_DIRECTIVES', () => {
     'scrum-master',
     'system-architect',
     'security-lead',
+    'sentinel',
   ];
 
   it('has an entry for every known Role', () => {

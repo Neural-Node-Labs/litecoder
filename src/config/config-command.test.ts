@@ -1,4 +1,4 @@
-// xcoder:version 5 | xcoder:task task-81af05 | xcoder:updated 2026-10-17T13:29:11.351Z | xcoder:subtask code-st-f1c53a
+// xcoder:version 3 | xcoder:task task-239998 | xcoder:updated 2026-10-30T17:06:01.370Z | xcoder:subtask test-st-50b14d
 // Contract tests for `kooder --config`: exit codes, all-or-nothing writes,
 // secret-free output. Uses a temp KOODER_CONFIG_FILE so no real HOME is touched.
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -7,7 +7,11 @@ import os from "node:os";
 import path from "node:path";
 import { Writable } from "node:stream";
 import { runConfigCommand, type ConfigCommandResult } from "./config-command.js";
-import { readUserConfig, resetUserConfigCache } from "./user-config.js";
+import {
+  forgetShellEnvShadow,
+  readUserConfig,
+  resetUserConfigCache,
+} from "./user-config.js";
 
 /**
  * Mirrors user-config.ts's own frozen set: a variable exported when the
@@ -26,10 +30,22 @@ beforeEach(() => {
   prev = process.env.KOODER_CONFIG_FILE;
   process.env.KOODER_CONFIG_FILE = file;
   resetUserConfigCache();
-  delete process.env.KOODER_API_KEY;
-  delete process.env.DEEPSEEK_API_KEY;
-  delete process.env.KOODER_MODEL;
-  delete process.env.KOODER_BASE_URL;
+  // Hermeticity: these four names are owned by this file. A vitest worker is
+  // shared across test files, and another file that ran first can leave one
+  // of them set in process.env; user-config.ts freezes that state at module
+  // load, so it would look shell-exported here and silently suppress the very
+  // applyUserConfig() write under test. Clearing the shadow unconditionally
+  // makes the outcome independent of test order. The shell-precedence rule
+  // itself is covered by the tests that pass an explicit `env` map.
+  for (const name of [
+    "KOODER_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "KOODER_MODEL",
+    "KOODER_BASE_URL",
+  ]) {
+    forgetShellEnvShadow(name);
+    delete process.env[name];
+  }
 });
 
 afterEach(() => {
